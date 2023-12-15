@@ -61,7 +61,7 @@ jobs:
       - name: Set matrix names
         id: set-matrix
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push"]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
             matrix=$(echo '{
               "include": [
                 {"execute": true, "description": "CentOS 7", "os": "centos7", "distr": "generic"},
@@ -109,7 +109,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Test production scripts
+      - name: "Test production scripts with ${{matrix.description}}"
         #if: ${{ github.event_name == 'schedule' }}
         uses: nick-fields/retry@v2
         with:
