@@ -122,7 +122,7 @@ jobs:
           retry_on: error
           command: |
             set -eux
-            
+
             cd tests/vagrant
             TEST_CASE='--production-install' \
             DISTR='${{ matrix.distr }}' \
@@ -139,7 +139,7 @@ jobs:
             vagrant destroy --force
 
       - name: "Test Local scripts with ${{matrix.description}}"
-        #if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         uses: nick-fields/retry@v2
         with:
           max_attempts: 2
