@@ -1,6 +1,7 @@
 name: CI tests for OneClickInstall DocSpace
 
 on:
+  push:
   pull_request:
     types: [opened, reopened, synchronize]
     paths:
@@ -60,7 +61,7 @@ jobs:
       - name: Set matrix names
         id: set-matrix
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule"]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push"]]; then
             matrix=$(echo '{
               "include": [
                 {"execute": true, "description": "CentOS 7", "os": "centos7", "distr": "generic"},
@@ -109,7 +110,7 @@ jobs:
           python-version: '3.x'
 
       - name: Test production scripts
-        if: ${{ github.event_name == 'schedule' }}
+        #if: ${{ github.event_name == 'schedule' }}
         uses: nick-fields/retry@v2
         with:
           max_attempts: 2
