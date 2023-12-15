@@ -56,7 +56,8 @@ fi
 echo -e "Package: *\nPin: origin \"packages.microsoft.com\"\nPin-Priority: 1002" | tee /etc/apt/preferences.d/99microsoft-prod.pref
 dpkg -i packages-microsoft-prod.deb && rm packages-microsoft-prod.deb
 
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 467B942D3A79BD29
+apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
+apt-key list
 MYSQL_REPO_VERSION="$(curl https://repo.mysql.com | grep -oP 'mysql-apt-config_\K.*' | grep -o '^[^_]*' | sort --version-sort --field-separator=. | tail -n1)"
 MYSQL_PACKAGE_NAME="mysql-apt-config_${MYSQL_REPO_VERSION}_all.deb"
 if ! dpkg -l | grep -q "mysql-server"; then
