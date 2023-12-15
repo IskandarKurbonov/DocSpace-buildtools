@@ -110,7 +110,7 @@ jobs:
       - name: Get update and install vagrant
         run: |
           set -eux
-          sudo apt update
+          sudo apt update -y
           sudo apt install vagrant virtualbox -y
 
       - name: "Test production scripts with ${{matrix.description}}"
