@@ -144,6 +144,7 @@ jobs:
           timeout_minutes: 40
           retry_on: error
           command: |
+            echo "tests"
             set -eux
             cd tests/vagrant
             TEST_CASE='--local-install' \
