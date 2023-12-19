@@ -1,7 +1,6 @@
-name: CI tests for OneClickInstall DocSpace
+name: Install OneClickInstall DocSpace
 
 on:
-  push:
   pull_request:
     types: [opened, reopened, synchronize]
     paths:
@@ -59,39 +58,38 @@ jobs:
       - name: Set matrix names
         id: set-matrix
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
-            matrix=$(echo '{
+          # if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "schedule"]]; then
+          #   matrix=$(echo '{
+          #     "include": [
+          #       {"execute": true, "name": "CentOS7", "os": "centos7", "distr": "generic"},
+          #       {"execute": true, "name": "CentOS8S", "os": "centos8s", "distr": "generic"},
+          #       {"execute": true, "name": "CentOS9S", "os": "centos9s", "distr": "generic"},
+          #       {"execute": true, "name": "Debian10", "os": "debian10", "distr": "generic"},
+          #       {"execute": true, "name": "Debian11", "os": "debian11", "distr": "generic"},
+          #       {"execute": true, "name": "Debian12", "os": "debian12", "distr": "generic"},
+          #       {"execute": true, "name": "Ubuntu18.04", "os": "ubuntu1804", "distr": "generic"},
+          #       {"execute": true, "name": "Ubuntu20.04", "os": "ubuntu2004", "distr": "generic"},
+          #       {"execute": true, "name": "Ubuntu22.04", "os": "ubuntu2204", "distr": "generic"}
+          #     ]
+          #   }' | jq -c '{include: [.include[] | select(.execute == true)]}')
+          # else
+          matrix=$(echo '{
               "include": [
-                {"execute": true, "description": "CentOS 7", "os": "centos7", "distr": "generic"},
-                {"execute": true, "description": "CentOS 8 Stream", "os": "centos8s", "distr": "generic"},
-                {"execute": true, "description": "CentOS 9 Stream", "os": "centos9s", "distr": "generic"},
-                {"execute": true, "description": "Debian 10", "os": "debian10", "distr": "generic"},
-                {"execute": true, "description": "Debian 11", "os": "debian11", "distr": "generic"},
-                {"execute": true, "description": "Debian 12", "os": "debian12", "distr": "generic"},
-                {"execute": true, "description": "Ubuntu 18.04", "os": "ubuntu1804", "distr": "generic"},
-                {"execute": true, "description": "Ubuntu 20.04", "os": "ubuntu2004", "distr": "generic"},
-                {"execute": true, "description": "Ubuntu 22.04", "os": "ubuntu2204", "distr": "generic"}
+                {"execute": '${{ github.event.inputs.centos7 }} || true', "name": "CentOS7", "os": "centos7", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.centos8s }} || true', "name": "CentOS8S", "os": "centos8s", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.centos9s }} || true', "name": "CentOS9S", "os": "centos9s", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.debian10 }} || true', "name": "Debian10", "os": "debian10", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.debian11 }} || true', "name": "Debian11", "os": "debian11", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.debian12 }} || true', "name": "Debian12", "os": "debian12", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.ubuntu1804 }} || true', "name": "Ubuntu18.04", "os": "ubuntu1804", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.ubuntu2004 }} || true', "name": "Ubuntu20.04", "os": "ubuntu2004", "distr": "generic"},
+                {"execute": '${{ github.event.inputs.ubuntu2204 }} || true', "name": "Ubuntu22.04", "os": "ubuntu2204", "distr": "generic"}
               ]
             }' | jq -c '{include: [.include[] | select(.execute == true)]}')
-          else
-            matrix=$(echo '{
-              "include": [
-                {"execute": '${{ github.event.inputs.centos7 }}', "description": "CentOS 7", "os": "centos7", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.centos8s }}', "description": "CentOS 8 Stream", "os": "centos8s", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.centos9s }}', "description": "CentOS 9 Stream", "os": "centos9s", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.debian10 }}', "description": "Debian 10", "os": "debian10", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.debian11 }}', "description": "Debian 11", "os": "debian11", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.debian12 }}', "description": "Debian 12", "os": "debian12", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.ubuntu1804 }}', "description": "Ubuntu 18.04", "os": "ubuntu1804", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.ubuntu2004 }}', "description": "Ubuntu 20.04", "os": "ubuntu2004", "distr": "generic"},
-                {"execute": '${{ github.event.inputs.ubuntu2204 }}', "description": "Ubuntu 22.04", "os": "ubuntu2204", "distr": "generic"}
-              ]
-            }' | jq -c '{include: [.include[] | select(.execute == true)]}')
-          fi
           echo "matrix=${matrix}" >> $GITHUB_OUTPUT
 
   vagrant-up:
-    name: "Test DocSpace with ${{ matrix.description}}"
+    name: "Test DocSpace with ${{ matrix.name}}"
     runs-on: ubuntu-22.04
     needs: prepare
     strategy:
@@ -113,7 +111,7 @@ jobs:
           sudo apt update -y
           sudo apt install vagrant virtualbox -y
 
-      - name: "Test production scripts with ${{matrix.description}}"
+      - name: "Test production scripts with ${{matrix.name}}"
         if: ${{ github.event_name == 'schedule' }}
         uses: nick-fields/retry@v2
         with:
@@ -122,7 +120,6 @@ jobs:
           retry_on: error
           command: |
             set -eux
-
             cd tests/vagrant
             TEST_CASE='--production-install' \
             DISTR='${{ matrix.distr }}' \
@@ -138,8 +135,8 @@ jobs:
             sleep 10
             vagrant destroy --force
 
-      - name: "Test Local scripts with ${{matrix.description}}"
-        #if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+      - name: "Test Local scripts with ${{matrix.name}}"
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
         uses: nick-fields/retry@v2
         with:
           max_attempts: 2
@@ -147,7 +144,6 @@ jobs:
           retry_on: error
           command: |
             set -eux
-            
             cd tests/vagrant
             TEST_CASE='--local-install' \
             DISTR='${{ matrix.distr }}' \
