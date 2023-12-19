@@ -91,7 +91,7 @@ curl -o /etc/yum.repos.d/openresty.repo "https://openresty.org/package/centos/${
 ${package_manager} -y install epel-release \
 			python3 \
 			nodejs ${NODEJS_OPTION} \
-			dotnet-sdk-8.0 \
+			dotnet-sdk-$(if [[ "$REV" = "7" ]]; then echo "7.0"; else echo "8.0"; fi) \
 			elasticsearch-${ELASTIC_VERSION} --enablerepo=elasticsearch \
 			mysql-server \
 			postgresql \
