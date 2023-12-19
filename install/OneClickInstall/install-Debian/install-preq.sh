@@ -106,7 +106,7 @@ apt-get install -o DPkg::options::="--force-confnew" -yq \
 				nodejs \
 				gcc \
 				make \
-				dotnet-sdk-$(if [[ "$DISTRIB_CODENAME" = "buster" || "$DISTRIB_CODENAME" = "bionic" ]]; then echo "7.0"; else echo "8.0"; fi) \
+				dotnet-sdk-8.0 \
 				mysql-server \
 				mysql-client \
 				postgresql \
