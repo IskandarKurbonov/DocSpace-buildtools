@@ -98,6 +98,12 @@ chmod 644 /usr/share/keyrings/openresty.gpg
 # setup msttcorefonts
 echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
 
+if [[ "$DISTRIB_CODENAME" =~ ^(buster|bionic)$ ]]; then
+	dotnet_version="7.0"
+else
+	dotnet_version="8.0"
+fi
+
 # install
 apt-get -y update
 apt-get install -o DPkg::options::="--force-confnew" -yq \
@@ -106,7 +112,7 @@ apt-get install -o DPkg::options::="--force-confnew" -yq \
 				nodejs \
 				gcc \
 				make \
-				dotnet-sdk-8.0 \
+				dotnet-sdk-${dotnet_version} \
 				mysql-server \
 				mysql-client \
 				postgresql \

@@ -88,10 +88,20 @@ rpm --import https://openresty.org/package/pubkey.gpg
 OPENRESTY_REPO_FILE=$( [[ "$REV" -ge 9 ]] && echo "openresty2.repo" || echo "openresty.repo" )
 curl -o /etc/yum.repos.d/openresty.repo "https://openresty.org/package/centos/${OPENRESTY_REPO_FILE}"
 
+if ! [[ "$REV" =~ ^[0-9]+$ ]]; then
+	REV=$(cat /etc/redhat-release | sed 's/[^0-9.]*//g');
+	MONOREV=7
+	if [[ $REV =~ 7 ]]; then
+		dotnet_version="7.0"
+	else
+		dotnet_version="8.0"
+	fi
+fi
+
 ${package_manager} -y install epel-release \
 			python3 \
 			nodejs ${NODEJS_OPTION} \
-			dotnet-sdk-8.0 \
+			dotnet-sdk-${dotnet_version} \
 			elasticsearch-${ELASTIC_VERSION} --enablerepo=elasticsearch \
 			mysql-server \
 			postgresql \
