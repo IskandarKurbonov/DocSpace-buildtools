@@ -78,6 +78,9 @@ jobs:
           sudo apt update -y
           sudo apt install vagrant virtualbox -y
 
+      - name: Login Vagrant cloud
+        run: vagrant cloud auth login --token ${VAGRANT_TOKEN}
+
       - name: Rebuild boxes
         uses: nick-fields/retry@v2
         with:
