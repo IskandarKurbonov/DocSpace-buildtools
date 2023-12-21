@@ -3,20 +3,6 @@ name: Rebuild boxes
 on:
   push:
   workflow_dispatch:
-
-env:
-    VAGRANT_TOKEN: ${{ secrets.VAGRANT_TOKEN }}
-    VAGRANT_ACCOUNT: ${{ secrets.VAGRANT_ACCOUNT }} 
-
-  pull_request:
-    types: [opened, reopened, synchronize]
-    paths:
-      - 'install/OneClickInstall/**'
-
-  schedule:
-    - cron: '00 20 * * 6'  # At 23:00 on Saturday.
-
-  workflow_dispatch:
     inputs:
       centos8s:
          type: boolean
@@ -42,6 +28,10 @@ env:
          type: boolean
          description: 'Ubuntu 22.04'
          default: true
+
+env:
+    VAGRANT_TOKEN: ${{ secrets.VAGRANT_TOKEN }}
+    VAGRANT_ACCOUNT: ${{ secrets.VAGRANT_ACCOUNT }} 
 
 jobs:
   prepare:
