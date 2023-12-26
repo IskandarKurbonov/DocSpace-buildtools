@@ -1,7 +1,7 @@
 name: Rebuild boxes
 
 on:
-  push:
+  #push:
   workflow_dispatch:
     inputs:
       centos8s:
@@ -96,7 +96,7 @@ jobs:
                     DISTR='${{matrix.distr}}' \
                     OS='${{ matrix.os }}' \
                     DOWNLOAD_SCRIPT='-ds true' \
-                    RAM='9100' \
+                    RAM='5100' \
                     CPU='3' \
                     ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false'" \
                     vagrant up
