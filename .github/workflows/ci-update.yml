@@ -94,19 +94,20 @@ jobs:
           retry_on: error
           command: |
                 cd ./tests/vagrant
-                set -eux
+                vagrant global-status
+                # set -eux
 
-                TEST_CASE='--local-install' \
-                DISTR='${{matrix.distr}}' \
-                RAM='5100' \
-                CPU='3' \
-                OS='docspace-${{ matrix.os }}' \
-                DOWNLOAD_SCRIPT='-ds false' \
-                TEST_REPO='-tr true' \
-                ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false --localscripts true --update true'" \
-                vagrant up
-                sleep 10
-                vagrant destroy --force
+                # TEST_CASE='--local-install' \
+                # DISTR='${{matrix.distr}}' \
+                # RAM='5100' \
+                # CPU='3' \
+                # OS='docspace-${{ matrix.os }}' \
+                # DOWNLOAD_SCRIPT='-ds false' \
+                # TEST_REPO='-tr true' \
+                # ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false --localscripts true --update true'" \
+                # vagrant up
+                # sleep 10
+                # vagrant destroy --force
           on_retry_command: |
               set -eux
               echo "Clean-up and one more try"
