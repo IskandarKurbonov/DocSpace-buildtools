@@ -1,7 +1,7 @@
 name: Rebuild boxes
 
 on:
-  #push:
+  push:
   workflow_dispatch:
     inputs:
       centos8s:
@@ -80,6 +80,11 @@ jobs:
 
       - name: Login Vagrant cloud
         run: vagrant cloud auth login --token ${VAGRANT_TOKEN}
+
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/local/lib/android /opt/ghc
+          sudo docker image prune --all --force        
 
       - name: Rebuild boxes
         uses: nick-fields/retry@v2
