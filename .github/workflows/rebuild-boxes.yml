@@ -1,7 +1,7 @@
 name: Rebuild boxes
 
 on:
-  push:
+  #push:
   workflow_dispatch:
     inputs:
       centos8s:
