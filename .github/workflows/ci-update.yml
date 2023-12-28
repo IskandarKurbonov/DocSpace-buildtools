@@ -4,7 +4,7 @@ run-name: >
   Update DocSpace from older versions
 
 on:
-  #push:
+  push:
   pull_request:
     types: [opened, reopened, synchronize]
     paths:
