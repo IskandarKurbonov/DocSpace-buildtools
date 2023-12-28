@@ -95,6 +95,7 @@ jobs:
           command: |
                 cd ./tests/vagrant
                 vagrant global-status
+                df -h
                 # set -eux
 
                 # TEST_CASE='--local-install' \
