@@ -81,6 +81,11 @@ jobs:
           sudo apt update -y
           sudo apt install vagrant virtualbox -y
 
+      - name: Free Disk Space
+        run: |
+          sudo rm -rf /usr/local/lib/android /opt/ghc
+          sudo docker image prune --all --force
+
       - name: "Test production scripts with ${{matrix.name}}"
         if: ${{ github.event_name == 'schedule' }}
         uses: nick-fields/retry@v2
