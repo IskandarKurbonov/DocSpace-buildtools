@@ -1,6 +1,16 @@
-name: Rebuild boxes
+name: Install OneClickInstall DocSpace
 
 on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    paths:
+      - 'install/OneClickInstall/**'
+      - '!install/OneClickInstall/install-Docker.sh'
+      - '!install/OneClickInstall/docspace-install.sh'
+
+  schedule:
+    - cron: '00 20 * * 6'  # At 23:00 on Saturday.
+
   workflow_dispatch:
     inputs:
       centos8s:
@@ -27,10 +37,14 @@ on:
          type: boolean
          description: 'Ubuntu 22.04'
          default: true
-
-env:
-    VAGRANT_TOKEN: ${{ secrets.VAGRANT_TOKEN }}
-    VAGRANT_ACCOUNT: ${{ secrets.VAGRANT_ACCOUNT }} 
+      fedora38:
+         type: boolean
+         description: 'Fedora 38'
+         default: true
+      fedora39:
+         type: boolean
+         description: 'Fedora 39'
+         default: true
 
 jobs:
   prepare:
@@ -49,13 +63,15 @@ jobs:
               {"execute": '${{ github.event.inputs.debian11 || true }}', "name": "Debian11", "os": "debian11", "distr": "generic"},
               {"execute": '${{ github.event.inputs.debian12 || true }}', "name": "Debian12", "os": "debian12", "distr": "generic"},
               {"execute": '${{ github.event.inputs.ubuntu2004 || true }}', "name": "Ubuntu20.04", "os": "ubuntu2004", "distr": "generic"},
-              {"execute": '${{ github.event.inputs.ubuntu2204 || true }}', "name": "Ubuntu22.04", "os": "ubuntu2204", "distr": "generic"}
+              {"execute": '${{ github.event.inputs.ubuntu2204 || true }}', "name": "Ubuntu22.04", "os": "ubuntu2204", "distr": "generic"},
+              {"execute": '${{ github.event.inputs.fedora38 || true }}', "name": "Fedora38", "os": "fedora38", "distr": "generic"},
+              {"execute": '${{ github.event.inputs.fedora39 || true }}', "name": "Fedora39", "os": "fedora39", "distr": "generic"}
             ]
           }' | jq -c '{include: [.include[] | select(.execute == true)]}')
           echo "matrix=${matrix}" >> $GITHUB_OUTPUT
 
-  rebuild-boxes:
-    name: "Rebuild boxes DocSpace on ${{ matrix.name}}"
+  vagrant-up:
+    name: "Test DocSpace with ${{ matrix.name}}"
     runs-on: ubuntu-22.04
     needs: prepare
     strategy:
@@ -77,47 +93,56 @@ jobs:
           sudo apt update -y
           sudo apt install vagrant virtualbox -y
 
-      - name: Login Vagrant cloud
-        run: vagrant cloud auth login --token ${VAGRANT_TOKEN}
-
       - name: Free Disk Space
         run: |
           sudo rm -rf /usr/local/lib/android /opt/ghc
-          sudo docker image prune --all --force        
+          sudo docker image prune --all --force
 
-      - name: Rebuild boxes
+      - name: "Test production scripts with ${{matrix.name}}"
+        if: ${{ github.event_name == 'schedule' }}
         uses: nick-fields/retry@v3
         with:
           max_attempts: 2
-          timeout_minutes: 90
+          timeout_minutes: 40
           retry_on: error
           command: |
-                  set -eux
-                  
-                  cd tests/vagrant
-                  export date=$(date +%F)
-                    TEST_CASE='--production-install' \
-                    DISTR='${{matrix.distr}}' \
-                    OS='${{ matrix.os }}' \
-                    DOWNLOAD_SCRIPT='-ds true' \
-                    RAM='5100' \
-                    CPU='3' \
-                    ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false'" \
-                    vagrant up
-                  sleep 300
-                  vagrant package --output repacked_${{ matrix.os }}.box
-                  vagrant cloud publish \
-                    ${VAGRANT_ACCOUNT}/docspace-${{ matrix.os }} \
-                    $date virtualbox repacked_${{ matrix.os }}.box \
-                    -d "Box with pre-installed DocSpace" \
-                    --version-description "DocSpace <version>" \
-                    --release --short-description "Boxes for update testing" \
-                    --force \
-                    --no-private
+            set -eux
+            cd tests/vagrant
+            TEST_CASE='--production-install' \
+            DISTR='${{ matrix.distr }}' \
+            OS='${{ matrix.os }}' \
+            DOWNLOAD_SCRIPT='-ds true' \
+            RAM='5100' \
+            CPU='3' \
+            ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false'" \
+            vagrant up
           on_retry_command: |
-                set -eux
+            echo "RUN CLEAN UP: Destroy vagrant and one more try"
+            cd tests/vagrant
+            sleep 10
+            vagrant destroy --force
 
-                echo "RUN CLEAN UP: Remove repacked box and destroy"
-                cd tests/vagrant
-                rm -rf repacked_${{ matrix.os }}.box
-                vagrant destroy --force
+      - name: "Test Local scripts with ${{matrix.name}}"
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 2
+          timeout_minutes: 40
+          retry_on: error
+          command: |
+            set -eux
+            cd tests/vagrant
+            TEST_CASE='--local-install' \
+            DISTR='${{ matrix.distr }}' \
+            OS='${{matrix.os}}' \
+            RAM='5100' \
+            CPU='3' \
+            DOWNLOAD_SCRIPT='-ds false' \
+            TEST_REPO='-tr true' \
+            ARGUMENTS="-arg '--skiphardwarecheck true --makeswap false --localscripts true'" \
+            vagrant up
+          on_retry_command: |
+            echo "RUN CLEAN UP: Destroy vagrant and one more try"
+            cd tests/vagrant
+            sleep 10
+            vagrant destroy --force
