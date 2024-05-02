@@ -1,6 +1,20 @@
 #!/bin/bash
 
- #
+#  SPDX-FileCopyrightText: 2024 Ascensio System SIA
+#
+#  SPDX-License-Identifier: Ascensio-System
+#
+#     Our License onlyoffice.com
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     
+
+#
  # (c) Copyright Ascensio System SIA 2021
  #
  # This program is a free software product. You can redistribute it and/or
