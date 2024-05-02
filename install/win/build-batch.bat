@@ -1,3 +1,17 @@
+REM  SPDX-FileCopyrightText: 2024 Ascensio System SIA
+REM
+REM  SPDX-License-Identifier: Ascensio-System
+REM
+REM     Our License onlyoffice.com
+REM     Empty line
+REM     Empty line
+REM     Empty line
+REM     Empty line
+REM     Empty line
+REM     Empty line
+REM     Empty line
+REM     
+
 REM echo ######## Set variables ########
 set "publisher="Ascensio System SIA""
 set "nuget="%cd%\server\thirdparty\SimpleRestServices\src\.nuget\NuGet.exe""
