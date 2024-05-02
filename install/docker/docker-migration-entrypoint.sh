@@ -1,5 +1,19 @@
 #!/bin/bash
 
+#  SPDX-FileCopyrightText: 2024 Ascensio System SIA
+#
+#  SPDX-License-Identifier: Ascensio-System
+#
+#     Our License onlyoffice.com
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     
+
 MYSQL_HOST=${MYSQL_HOST:-${MYSQL_CONTAINER_NAME}}
 MYSQL_DATABASE=${MYSQL_DATABASE:-"onlyoffice"}
 MYSQL_USER=${MYSQL_USER:-"onlyoffice_user"}

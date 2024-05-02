@@ -1,4 +1,19 @@
-#!/bin/bash 
+#!/bin/bash
+
+#  SPDX-FileCopyrightText: 2024 Ascensio System SIA
+#
+#  SPDX-License-Identifier: Ascensio-System
+#
+#     Our License onlyoffice.com
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     
+
 # read parameters
 if [ -n "$1" ]; then
 	RUN_DLL="${1}";

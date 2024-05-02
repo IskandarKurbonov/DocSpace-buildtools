@@ -1,4 +1,19 @@
 #!/bin/sh
+
+#  SPDX-FileCopyrightText: 2024 Ascensio System SIA
+#
+#  SPDX-License-Identifier: Ascensio-System
+#
+#     Our License onlyoffice.com
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     Empty line
+#     
+
 # vim:sw=4:ts=4:et
 
 set -e
